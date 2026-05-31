@@ -1,0 +1,76 @@
+.tmtwp-admin {
+  max-width: 1180px;
+}
+
+.tmtwp-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(320px, 0.7fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.tmtwp-card {
+  background: #fff;
+  border: 1px solid #dfe7f2;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.tmtwp-card h2 {
+  margin-top: 0;
+}
+
+.tmtwp-card label,
+.tmtwp-metabox label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.tmtwp-card input,
+.tmtwp-metabox input[type="text"],
+.tmtwp-metabox input[type="number"] {
+  width: 100%;
+}
+
+.tmtwp-metabox .tmtwp-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tmtwp-metabox .tmtwp-check input {
+  width: auto;
+}
+
+.tmtwp-status-ok {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.tmtwp-status-warning {
+  color: #c2410c;
+  font-weight: 700;
+}
+
+.tmtwp-facts {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 14px;
+  margin: 14px 0 18px;
+}
+
+.tmtwp-facts span {
+  color: #52657f;
+}
+
+.tmtwp-facts strong {
+  color: #0e1b34;
+}
+
+@media (max-width: 900px) {
+  .tmtwp-grid {
+    grid-template-columns: 1fr;
+  }
+}

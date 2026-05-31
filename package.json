@@ -1,0 +1,39 @@
+{
+  "name": "true-margin-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "True Margin Tracker SaaS for real Shopify and WooCommerce product profitability.",
+  "packageManager": "pnpm@11.1.2",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @tmt/api --filter @tmt/dashboard dev",
+    "build": "pnpm -r build && node scripts/write-plugin-release-manifest.mjs",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "assets:marketplace": "node scripts/generate-marketplace-assets.mjs",
+    "release:plugins": "pnpm --filter @tmt/woocommerce-plugin build && pnpm --filter @tmt/wordpress-plugin build && pnpm --filter @tmt/license-bridge-plugin build && node scripts/write-plugin-release-manifest.mjs && node scripts/package-wordpress-svn.mjs && pnpm assets:marketplace",
+    "verify:production": "node scripts/verify-production-readiness.mjs",
+    "db:generate": "pnpm --filter @tmt/api db:generate",
+    "db:migrate": "pnpm --filter @tmt/api db:migrate",
+    "db:seed": "pnpm --filter @tmt/api db:seed"
+  },
+  "devDependencies": {
+    "@prisma/client": "^7.8.0",
+    "@types/node": "^20.19.25",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "prisma": "^7.8.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.14"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "fastify": "^5.8.5",
+    "lucide-react": "^1.16.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@tmt/wordpress-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tests/static-check.mjs && php tests/integration-smoke.php && node ../../scripts/package-wordpress-plugin.mjs wordpress",
+    "test": "node tests/static-check.mjs && php tests/integration-smoke.php",
+    "lint": "node tests/static-check.mjs"
+  }
+}

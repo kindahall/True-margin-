@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: true_margin_tracker
+      POSTGRES_USER: true_margin_tracker
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U true_margin_tracker -d true_margin_tracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4001
+      APP_URL: ${APP_URL:?set APP_URL}
+      DATABASE_URL: postgresql://true_margin_tracker:${POSTGRES_PASSWORD}@postgres:5432/true_margin_tracker
+      REDIS_URL: redis://redis:6379
+      TMT_PERSISTENCE_DRIVER: prisma
+      TMT_REQUIRE_AUTH: "true"
+      TMT_REQUIRE_LICENSE: "true"
+      TMT_SECRET_ENCRYPTION_KEY: ${TMT_SECRET_ENCRYPTION_KEY:?set TMT_SECRET_ENCRYPTION_KEY}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET}
+      TMT_SALES_WEBHOOK_SECRET: ${TMT_SALES_WEBHOOK_SECRET:?set TMT_SALES_WEBHOOK_SECRET}
+      TMT_LICENSE_ISSUER_TOKEN: ${TMT_LICENSE_ISSUER_TOKEN:?set TMT_LICENSE_ISSUER_TOKEN}
+      TMT_SHOPIFY_INSTALL_SECRET: ${TMT_SHOPIFY_INSTALL_SECRET:?set TMT_SHOPIFY_INSTALL_SECRET}
+      SHOPIFY_APP_URL: ${SHOPIFY_APP_URL:?set SHOPIFY_APP_URL}
+    ports:
+      - "4001:4001"
+
+  shopify-app:
+    build:
+      context: .
+      dockerfile: apps/shopify-app/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      SHOPIFY_APP_PORT: 4100
+      SHOPIFY_API_KEY: ${SHOPIFY_API_KEY:?set SHOPIFY_API_KEY}
+      SHOPIFY_API_SECRET: ${SHOPIFY_API_SECRET:?set SHOPIFY_API_SECRET}
+      SHOPIFY_APP_URL: ${SHOPIFY_APP_URL:?set SHOPIFY_APP_URL}
+      DASHBOARD_URL: ${DASHBOARD_URL:?set DASHBOARD_URL}
+      TMT_API_URL: ${TMT_API_URL:?set TMT_API_URL}
+      TMT_SHOPIFY_INSTALL_SECRET: ${TMT_SHOPIFY_INSTALL_SECRET:?set TMT_SHOPIFY_INSTALL_SECRET}
+      SHOPIFY_INSTALLATION_FILE: /data/shopify-installations.json
+    volumes:
+      - shopify-data:/data
+    ports:
+      - "4100:4100"
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:?set VITE_API_URL}
+        VITE_PURCHASE_URL: ${VITE_PURCHASE_URL:?set VITE_PURCHASE_URL}
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres-data:
+  redis-data:
+  shopify-data:

@@ -1,0 +1,44 @@
+.tmt-admin {
+  max-width: 1180px;
+}
+
+.tmt-subtitle {
+  color: #52657f;
+  font-size: 15px;
+}
+
+.tmt-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(320px, 0.7fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.tmt-card {
+  background: #fff;
+  border: 1px solid #dfe7f2;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.tmt-card label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.tmt-card input {
+  width: 100%;
+  max-width: 520px;
+}
+
+.tmt-status-ok {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.tmt-status-warning {
+  color: #c2410c;
+  font-weight: 700;
+}

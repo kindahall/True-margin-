@@ -1,0 +1,11 @@
+{
+  "name": "@tmt/license-bridge-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tests/static-check.mjs && php tests/integration-smoke.php && node ../../scripts/package-wordpress-plugin.mjs license-bridge",
+    "test": "node tests/static-check.mjs && php tests/integration-smoke.php",
+    "lint": "node tests/static-check.mjs"
+  }
+}

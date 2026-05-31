@@ -1,0 +1,25 @@
+{
+  "name": "@tmt/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "db:generate": "pnpm exec prisma generate --schema ../../prisma/schema.prisma",
+    "db:migrate": "pnpm exec prisma migrate dev --schema ../../prisma/schema.prisma",
+    "db:seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@prisma/client": "^7.8.0",
+    "@tmt/margin-engine": "workspace:*",
+    "@tmt/shared": "workspace:*",
+    "fastify": "^5.8.5",
+    "zod": "^4.4.3"
+  }
+}

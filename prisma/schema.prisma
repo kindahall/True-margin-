@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StorePlatform {
+  SHOPIFY
+  WOOCOMMERCE
+  WORDPRESS
+}
+
+enum CostSourceType {
+  EXACT
+  ESTIMATED
+  MANUAL
+  IMPORTED
+  RULE
+}
+
+enum MarginStatus {
+  PROFITABLE
+  WARNING
+  LOSS
+  UNKNOWN
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  currency  String   @default("USD")
+  createdAt DateTime @default(now())
+  users     User[]
+  stores    Store[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  tenantId  String
+  emailHash String?
+  name      String
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+model Store {
+  id         String        @id @default(cuid())
+  tenantId   String
+  platform   StorePlatform
+  name       String
+  externalId String?
+  currency   String        @default("USD")
+  createdAt  DateTime      @default(now())
+  tenant     Tenant        @relation(fields: [tenantId], references: [id])
+  products   Product[]
+  orders     Order[]
+
+  @@index([tenantId])
+  @@index([externalId])
+  @@index([createdAt])
+}
+
+model IntegrationCredential {
+  id                 String        @id @default(cuid())
+  tenantId           String
+  storeId            String?
+  provider           String
+  encryptedSecret    String
+  createdAt          DateTime      @default(now())
+  disabledAt         DateTime?
+
+  @@index([tenantId])
+  @@index([storeId])
+}
+
+model Product {
+  id         String           @id @default(cuid())
+  tenantId   String
+  storeId    String
+  externalId String
+  title      String
+  handle     String?
+  createdAt  DateTime         @default(now())
+  store      Store            @relation(fields: [storeId], references: [id])
+  variants   ProductVariant[]
+
+  @@index([tenantId])
+  @@index([storeId])
+  @@index([externalId])
+  @@index([createdAt])
+}
+
+model ProductVariant {
+  id         String        @id @default(cuid())
+  tenantId   String
+  productId  String
+  externalId String
+  sku        String?
+  title      String
+  product    Product       @relation(fields: [productId], references: [id])
+  costs      ProductCost[]
+  lines      OrderLine[]
+
+  @@index([tenantId])
+  @@index([externalId])
+  @@index([sku])
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  tenantId   String
+  storeId    String
+  externalId String
+  currency   String
+  createdAt  DateTime    @default(now())
+  store      Store       @relation(fields: [storeId], references: [id])
+  lines      OrderLine[]
+  refunds    Refund[]
+
+  @@index([tenantId])
+  @@index([storeId])
+  @@index([externalId])
+  @@index([createdAt])
+}
+
+model OrderLine {
+  id        String         @id @default(cuid())
+  tenantId  String
+  orderId   String
+  variantId String?
+  quantity  Int
+  revenueMinor Int
+  order     Order          @relation(fields: [orderId], references: [id])
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([tenantId])
+  @@index([orderId])
+  @@index([variantId])
+}
+
+model Refund {
+  id          String   @id @default(cuid())
+  tenantId    String
+  orderId     String
+  externalId  String
+  amountMinor Int
+  createdAt   DateTime @default(now())
+  order       Order    @relation(fields: [orderId], references: [id])
+
+  @@index([tenantId])
+  @@index([externalId])
+  @@index([createdAt])
+}
+
+model ProductCost {
+  id              String         @id @default(cuid())
+  tenantId        String
+  variantId       String
+  amountMinor     Int
+  currency        String
+  sourceType      CostSourceType
+  sourceName      String
+  confidenceScore Float
+  createdAt       DateTime       @default(now())
+  variant         ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@index([tenantId])
+  @@index([variantId])
+  @@index([createdAt])
+}
+
+model MarginSnapshot {
+  id                 String       @id @default(cuid())
+  tenantId           String
+  storeId            String
+  productId          String?
+  variantId          String?
+  revenueNetMinor    Int
+  variableCostsMinor Int
+  trueMarginMinor    Int
+  trueMarginPercent  Float?
+  status             MarginStatus
+  createdAt          DateTime     @default(now())
+
+  @@index([tenantId])
+  @@index([storeId])
+  @@index([variantId])
+  @@index([createdAt])
+}
+
+model AlertRule {
+  id        String   @id @default(cuid())
+  tenantId  String
+  type      String
+  threshold Float?
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model AlertEvent {
+  id        String   @id @default(cuid())
+  tenantId  String
+  ruleId    String?
+  productId String?
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model SyncJob {
+  id        String   @id @default(cuid())
+  tenantId  String
+  storeId   String
+  type      String
+  status    String
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([storeId])
+  @@index([createdAt])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  provider    String
+  externalId  String
+  topic       String
+  processedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([provider, externalId])
+  @@index([tenantId])
+  @@index([createdAt])
+}
+
+model RuntimeState {
+  id        String   @id @default(cuid())
+  tenantId  String
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+  @@index([updatedAt])
+}

@@ -1,0 +1,24 @@
+node_modules/
+dist/
+.env
+.DS_Store
+coverage/
+playwright-report/
+test-results/
+.turbo/
+vendor/
+
+.data/
+apps/*/.data/
+.package/
+release/
+apps/dashboard/public/downloads/*.zip
+apps/dashboard/public/downloads/plugin-manifest.json
+
+# Local prompt/reference artifacts
+ChatGPT Image *.png
+Image*.png
+SKILLcreation site codex.md
+karpaty.md
+tmt-audit-price-scout.png
+true-margin-tracker-prompt-codex-v2.md
