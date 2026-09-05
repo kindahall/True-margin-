@@ -30,3 +30,7 @@ Copy `.env.example` to `.env` for local development and fill the required produc
 ## Security Notes
 
 Production mode is fail-closed for authentication and licensing unless explicitly overridden for an unsafe local test. Configure HTTPS URLs, signing secrets, webhook secrets, and encryption keys before exposing the services publicly.
+
+## Support
+
+If this project is useful to you, you can support its development with a free and entirely optional tip through the repository's **Sponsor** button. Thank you for your support.
